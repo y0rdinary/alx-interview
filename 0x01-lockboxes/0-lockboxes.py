@@ -1,5 +1,13 @@
 #!/usr/bin/python3
+"""LockBoxes - ALX"""
+
+
 def canUnlockAll(boxes):
+    """determines if all the boxes can be opened or not
+    Returns:
+        True: all boxes can be opened
+        False: not all boxes can be opened
+    """
     keys = set()
     opened_boxes = []
     i = 0
