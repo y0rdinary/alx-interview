@@ -2,7 +2,6 @@
 """ Parses Logs """
 import sys
 
-
 i = 0
 FileSize = 0
 status = {'200': 0, '301': 0, '400': 0, '401': 0,
