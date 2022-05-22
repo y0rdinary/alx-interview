@@ -1,45 +1,53 @@
 #!/usr/bin/node
 
-/**
- * Star wars api
- * Script that prints all characters of a Star Wars movie:
- */
- const request = require('request');
- const filmId = process.argv[2];
- if (!filmId || isNaN(filmId)) {
-   process.exit(1);
- }
- const url = `https://swapi-api.hbtn.io/api/films/${filmId}`;
- 
- request(url, (error, response, body) => {
-   if (error) {
-     console.log(error);
-     return;
-   }
-   const respPromises = [];
- 
-   const json = JSON.parse(body);
-   const characters = json.characters;
- 
-   characters.forEach((character) => {
-     const url = character;
-     const promise = new Promise((resolve, reject) => {
-       request(url, (error, response, body) => {
-         if (error) {
-           reject(error);
-           return;
-         }
-         const json = JSON.parse(body);
-         resolve(json.name);
-       });
-     });
-     respPromises.push(promise);
-   });
-   Promise.all(respPromises).then((values) => {
-     values.forEach((value) => {
-       console.log(value);
-     });
-   }).catch((error) => {
-     console.log(error);
-   });
- });
+const request = require('request');
+
+const movieId = process.argv[2];
+const filmEndPoint = 'https://swapi-api.hbtn.io/api/films/' + movieId;
+let people = [];
+const names = [];
+
+const requestCharacters = async () => {
+  await new Promise(resolve => request(filmEndPoint, (err, res, body) => {
+    if (err || res.statusCode !== 200) {
+      console.error('Error: ', err, '| StatusCode: ', res.statusCode);
+    } else {
+      const jsonBody = JSON.parse(body);
+      people = jsonBody.characters;
+      resolve();
+    }
+  }));
+};
+
+const requestNames = async () => {
+  if (people.length > 0) {
+    for (const p of people) {
+      await new Promise(resolve => request(p, (err, res, body) => {
+        if (err || res.statusCode !== 200) {
+          console.error('Error: ', err, '| StatusCode: ', res.statusCode);
+        } else {
+          const jsonBody = JSON.parse(body);
+          names.push(jsonBody.name);
+          resolve();
+        }
+      }));
+    }
+  } else {
+    console.error('Error: Got no Characters for some reason');
+  }
+};
+
+const getCharNames = async () => {
+  await requestCharacters();
+  await requestNames();
+
+  for (const n of names) {
+    if (n === names[names.length - 1]) {
+      process.stdout.write(n);
+    } else {
+      process.stdout.write(n + '\n');
+    }
+  }
+};
+
+getCharNames();
