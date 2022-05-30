@@ -1,7 +1,8 @@
 #!/usr/bin/python3
-""" 
-A function to rotate n X n matrix 
 """
+A function to rotate n X n matrix
+"""
+
 
 def rotate_2d_matrix(matrix):
     rotate = []
